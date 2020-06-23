@@ -48,7 +48,10 @@ class Binomial(Distribution):
         #               farther down in the code starting in line 55.
         #               The init function can get access to these methods via the self
         #               variable.
-        pass
+        self.p = prob
+        self.n = size
+
+        Distribution.__init__(self, self.calculate_mean(), self.calculate_stdev())
 
     def calculate_mean(self):
 
@@ -65,7 +68,9 @@ class Binomial(Distribution):
         # TODO: calculate the mean of the Binomial distribution. Store the mean
         #       via the self variable and also return the new mean value
 
-        pass
+        self.mean = self.p * self.n
+
+        return self.mean
 
     def calculate_stdev(self):
 
@@ -82,7 +87,9 @@ class Binomial(Distribution):
         # TODO: calculate the standard deviation of the Binomial distribution. Store
         #       the result in the self standard deviation attribute. Return the value
         #       of the standard deviation.
-        pass
+        self.stdev = math.sqrt(self.n * self.p * (1 - self.p))
+
+        return self.stdev
 
     def replace_stats_with_data(self):
 
@@ -114,7 +121,12 @@ class Binomial(Distribution):
         #
         #       Hint: You can use the calculate_mean() and calculate_stdev() methods
         #           defined previously.
-        pass
+        self.n = len(self.data)
+        self.p = 1.0 * sum(self.data) / len(self.data)
+        self.mean = self.calculate_mean()
+        self.stdev = self.calculate_stdev()
+
+        return self.p, self.n
 
     def plot_bar(self):
         """Function to output a histogram of the instance variable data using
@@ -138,7 +150,10 @@ class Binomial(Distribution):
         #       1 on the x-axis and 20 on the y-axis
 
         #       Make sure to label the chart with a title, x-axis label and y-axis label
-        pass
+        plt.bar(x = ['0', '1'], height = [(1 - self.p) * self.n, self.p * self.n])
+        plt.title = ('Bar chart of Data')
+        plt.xlabel = ('outcome')
+        plt.ylabel = ('count')
 
     def pdf(self, k):
         """Probability density function calculator for the gaussian distribution.
@@ -159,7 +174,10 @@ class Binomial(Distribution):
         #   For example, if you flip a coin n = 60 times, with p = .5,
         #   what's the likelihood that the coin lands on heads 40 out of 60 times?
 
-        pass
+        a = math.factorial(self.n) / (math.factorial(k) * (math.factorial(self.n - k)))
+        b = (self.p ** k) * (1 - self.p) ** (self.n - k)
+
+        return a * b
 
     def plot_bar_pdf(self):
 
@@ -185,6 +203,24 @@ class Binomial(Distribution):
         #   This method should also return the x and y values used to make the chart
         #   The x and y values should be stored in separate lists
 
+        x = []
+        y = []
+
+        # calculate the x values to visualize
+        for i in range(self.n + 1):
+            x.append(i)
+            y.append(self.pdf(i))
+
+        # plot
+        plt.bar(x,y)
+        plt.title('Distribution of outcomes')
+        plt.xlabel('Outcome')
+        plt.ylabel('Probability')
+
+        plt.show()
+
+        return x, y
+
     def __add__(self, other):
 
         """Function to add together two Binomial distributions with equal p
@@ -202,6 +238,14 @@ class Binomial(Distribution):
         except AssertionError as error:
             raise
 
+        result = Binomial()
+        result.n = self.n + other.n
+        result.p = self.p
+        result.calculate_mean()
+        result.calculate_stdev()
+
+        return result
+
         # TODO: Define addition for two binomial distributions. Assume that the
         # p values of the two distributions are the same. The formula for
         # summing two binomial distributions with different p values is more complicated,
@@ -215,8 +259,6 @@ class Binomial(Distribution):
 
         #   When adding two binomial distributions, the p value remains the same
         #   The new n value is the sum of the n values of the two distributions.
-
-        pass
 
     def __repr__(self):
 
@@ -236,5 +278,5 @@ class Binomial(Distribution):
         #       with the values replaced by whatever the actual distributions values are
         #       The method should return a string in the expected format
 
-        pass
+        return "mean {}, standard deviation {}, p {}, n {}".format(self.mean, self.stdev, self.p, self.n)
 
